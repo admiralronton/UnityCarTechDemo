@@ -9,7 +9,6 @@ namespace UnityStandardAssets.Vehicles.Car
     {
         private CarController m_Car; // the car controller we want to use
 
-
         private void Awake()
         {
             // get the car controller
@@ -24,10 +23,20 @@ namespace UnityStandardAssets.Vehicles.Car
             float v = CrossPlatformInputManager.GetAxis("Vertical");
 #if !MOBILE_INPUT
             float handbrake = CrossPlatformInputManager.GetAxis("Jump");
+
+            // Neutral input
+            // This will ONLY fire the frame after the key is pressed
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                // Toggle neutral gear
+                m_Car.Neutral = !m_Car.Neutral;
+            }
+
             m_Car.Move(h, v, v, handbrake);
 #else
             m_Car.Move(h, v, v, 0f);
 #endif
         }
+
     }
 }

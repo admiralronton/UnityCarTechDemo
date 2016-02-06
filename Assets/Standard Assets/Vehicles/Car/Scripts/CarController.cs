@@ -36,6 +36,8 @@ namespace UnityStandardAssets.Vehicles.Car
         [SerializeField] private float m_RevRangeBoundary = 1f;
         [SerializeField] private float m_SlipLimit;
         [SerializeField] private float m_BrakeTorque;
+        [SerializeField] private float m_GravityMultiplier = 1f;
+        [SerializeField] private float m_TireFrictionMultiplier = 1f;
 
         private Quaternion[] m_WheelMeshLocalRotations;
         private Vector3 m_Prevpos, m_Pos;
@@ -54,6 +56,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public float MaxSpeed{get { return m_Topspeed; }}
         public float Revs { get; private set; }
         public float AccelInput { get; private set; }
+        public bool Neutral { get; set; }
 
         // Use this for initialization
         private void Start()
@@ -62,6 +65,16 @@ namespace UnityStandardAssets.Vehicles.Car
             for (int i = 0; i < 4; i++)
             {
                 m_WheelMeshLocalRotations[i] = m_WheelMeshes[i].transform.localRotation;
+
+                // Initialize forward friction
+                WheelFrictionCurve fFriction = m_WheelColliders[i].forwardFriction;
+                fFriction.stiffness = m_TireFrictionMultiplier;
+                m_WheelColliders[i].forwardFriction = fFriction;
+
+                // Initialize sideways friction
+                WheelFrictionCurve sFriction = m_WheelColliders[i].sidewaysFriction;
+                sFriction.stiffness = m_TireFrictionMultiplier;
+                m_WheelColliders[i].sidewaysFriction = sFriction;
             }
             m_WheelColliders[0].attachedRigidbody.centerOfMass = m_CentreOfMassOffset;
 
@@ -69,6 +82,8 @@ namespace UnityStandardAssets.Vehicles.Car
 
             m_Rigidbody = GetComponent<Rigidbody>();
             m_CurrentTorque = m_FullTorqueOverAllWheels - (m_TractionControl*m_FullTorqueOverAllWheels);
+
+            Neutral = false;
         }
 
 
@@ -137,11 +152,26 @@ namespace UnityStandardAssets.Vehicles.Car
                 m_WheelMeshes[i].transform.rotation = quat;
             }
 
+            // Gravity
+            Rigidbody body = GetComponent<Rigidbody>();
+            // If a force other than 1 is specified, let's add that to the existing gravity reference so we don't have to disable
+            // gravity entirely
+            body.AddForce(Physics.gravity * body.mass * (m_GravityMultiplier - 1f));
+
+            // Neutral processing
+            if (Neutral)
+            {
+                // Ignore acceleration
+                accel = 0f;
+                footbrake = 0f;
+            }
+
             //clamp input values
             steering = Mathf.Clamp(steering, -1, 1);
             AccelInput = accel = Mathf.Clamp(accel, 0, 1);
             BrakeInput = footbrake = -1*Mathf.Clamp(footbrake, -1, 0);
             handbrake = Mathf.Clamp(handbrake, 0, 1);
+
 
             //Set the steer on the front wheels.
             //Assuming that wheels 0 and 1 are the front wheels.
@@ -197,6 +227,7 @@ namespace UnityStandardAssets.Vehicles.Car
         {
 
             float thrustTorque;
+
             switch (m_CarDriveType)
             {
                 case CarDriveType.FourWheelDrive:
@@ -337,7 +368,11 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private void AdjustTorque(float forwardSlip)
         {
-            if (forwardSlip >= m_SlipLimit && m_CurrentTorque >= 0)
+            if (Neutral)
+            {
+                m_CurrentTorque = 0f;
+            }
+            else if (forwardSlip >= m_SlipLimit && m_CurrentTorque >= 0)
             {
                 m_CurrentTorque -= 10 * m_TractionControl;
             }
