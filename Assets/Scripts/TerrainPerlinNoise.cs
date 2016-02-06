@@ -10,11 +10,14 @@ using System.Collections;
 /// </remarks>
 public class TerrainPerlinNoise : ScriptableWizard
 {
-    [Tooltip("How far apart the hills are.  Lower is more sparse.")]
+    [Tooltip("How sparse hills are.  Lower is farther.")]
     public float Tiling = 5.0f;
 
     [Tooltip("How high the hills are.  Higher value creates lower hills.")]
     public float HeightDivisor = 30.0f;
+
+    [Tooltip("How rounded the hills are.  Higher is sharper.")]
+    public float Rounding = 1;
 
     [MenuItem("Terrain/Generate from Perlin Noise")]
     public static void CreateWizard(MenuCommand command)
@@ -31,9 +34,9 @@ public class TerrainPerlinNoise : ScriptableWizard
     {
         GameObject obj = Selection.activeGameObject;
 
-        if (obj.GetComponent<Terrain>())
+        if (obj != null && obj.GetComponent<Terrain>())
         {
-            GenerateHeights(obj.GetComponent<Terrain>(), Tiling, HeightDivisor);
+            GenerateHeights(obj.GetComponent<Terrain>(), Tiling, HeightDivisor, Rounding);
         }
     }
 
@@ -43,7 +46,8 @@ public class TerrainPerlinNoise : ScriptableWizard
     /// <param name="terrain">Terrain</param>
     /// <param name="tileSize">Density of the hills</param>
     /// <param name="height">Height divisor.  Lower is larger</param>
-    public void GenerateHeights(Terrain terrain, float tileSize, float height)
+    /// <param name="rounding">How round the terrain is.  Higher is sharper.</param>
+    public void GenerateHeights(Terrain terrain, float tileSize, float height, float rounding)
     {
         float[,] heights = new float[terrain.terrainData.heightmapWidth, terrain.terrainData.heightmapHeight];
 
@@ -51,7 +55,17 @@ public class TerrainPerlinNoise : ScriptableWizard
         {
             for (int k = 0; k < terrain.terrainData.heightmapHeight; k++)
             {
-                heights[i, k] = Mathf.PerlinNoise(((float)i / (float)terrain.terrainData.heightmapWidth) * tileSize, ((float)k / (float)terrain.terrainData.heightmapHeight) * tileSize) / height;
+                // Generate a random number between 0 and 1
+                float value = Mathf.PerlinNoise(((float)i / (float)terrain.terrainData.heightmapWidth) * tileSize,
+                    ((float)k / (float)terrain.terrainData.heightmapHeight) * tileSize);
+
+                // Multiply by some sort of curve, taking the rounding factor into account.  Rounding should be between 0 and 1, 
+                // where 0 leaves things as they are, and 1 makes the hills almost into plateaus
+                float padding = (1f - value) - ((1f - value) * rounding);
+                value += padding;
+
+                // Divide by our height to flatten things out
+                heights[i, k] = value / height;
             }
         }
 
