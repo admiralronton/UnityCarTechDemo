@@ -51,6 +51,8 @@ namespace UnityStandardAssets.Vehicles.Car
         private Rigidbody m_Rigidbody;
         private const float k_ReversingThreshold = 0.01f;
         private List<ParticleSystem> m_Exhausts;
+        private List<Light> m_Headlights;
+        private bool m_AreHeadlightsOn = false;
 
         public bool Skidding { get; private set; }
         public float BrakeInput { get; private set; }
@@ -89,11 +91,15 @@ namespace UnityStandardAssets.Vehicles.Car
 
             Neutral = false;
 
+            // Get Exhaust objects
             m_Exhausts = transform.root.GetComponentsInChildren<ParticleSystem>().Where(c => c.name.StartsWith("ParticleExhaust")).ToList();
             foreach(ParticleSystem particle in m_Exhausts)
             {
                 particle.Stop();
             }
+
+            // Get headlight objects
+            m_Headlights = transform.root.GetComponentsInChildren<Light>().Where(l => l.name.StartsWith("Headlight")).ToList();
         }
 
 
@@ -174,6 +180,26 @@ namespace UnityStandardAssets.Vehicles.Car
                 // Ignore acceleration
                 accel = 0f;
                 footbrake = 0f;
+
+                if (m_AreHeadlightsOn)
+                {
+                    foreach(Light light in m_Headlights)
+                    {
+                        light.enabled = false;
+                    }
+                    m_AreHeadlightsOn = false;
+                }
+            }
+            else
+            {
+                if (!m_AreHeadlightsOn)
+                {
+                    foreach (Light light in m_Headlights)
+                    {
+                        light.enabled = true;
+                    }
+                    m_AreHeadlightsOn = true;
+                }
             }
 
             //clamp input values
@@ -210,8 +236,29 @@ namespace UnityStandardAssets.Vehicles.Car
             AddDownForce();
             CheckForWheelSpin();
             TractionControl();
+            CheckHeadlights();
         }
 
+        private void CheckHeadlights()
+        {
+            if (Neutral && m_AreHeadlightsOn)
+            {
+                ToggleHeadlights(false);
+            }
+            else if (!Neutral && !m_AreHeadlightsOn)
+            {
+                ToggleHeadlights(true);
+            }
+        }
+
+        private void ToggleHeadlights(bool isOn)
+        {
+            foreach (Light light in m_Headlights)
+            {
+                light.enabled = isOn;
+            }
+            m_AreHeadlightsOn = isOn;
+        }
 
         private void CapSpeed()
         {
