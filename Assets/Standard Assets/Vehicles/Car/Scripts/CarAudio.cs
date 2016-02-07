@@ -35,6 +35,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public AudioClip highAccelClip;                                             // Audio clip for high acceleration
         public AudioClip highDecelClip;                                             // Audio clip for high deceleration
         public AudioClip honkClip;                                                  // Audio clip for honking
+        public AudioClip gearShiftClip;                                             // Audio clip for gear shifting
         public float pitchMultiplier = 1f;                                          // Used for altering the pitch of audio clips
         public float lowPitchMin = 1f;                                              // The lowest possible pitch for the low sounds
         public float lowPitchMax = 6f;                                              // The highest possible pitch for the low sounds
@@ -43,14 +44,18 @@ namespace UnityStandardAssets.Vehicles.Car
         public float dopplerLevel = 1;                                              // The mount of doppler effect used in the audio
         public bool useDoppler = true;                                              // Toggle for using doppler
 
+        public float shiftPitchMin = 0.5f;                                          // Shifter minimum pitch
+        public float shiftPitchMax = 1.5f;                                          // Shifter maximum pitch
+
         private AudioSource m_LowAccel; // Source for the low acceleration sounds
         private AudioSource m_LowDecel; // Source for the low deceleration sounds
         private AudioSource m_HighAccel; // Source for the high acceleration sounds
         private AudioSource m_HighDecel; // Source for the high deceleration sounds
-        private AudioSource m_honk; // Source for honking
+        private AudioSource m_Honk; // Source for honking
+        private AudioSource m_Shift; // Source for shifting
         private bool m_StartedSound; // flag for knowing if we have started sounds
         private CarController m_CarController; // Reference to car we are controlling
-
+        private bool m_LastNeutral;  // Last shift sound played
 
         private void StartSound()
         {
@@ -68,7 +73,9 @@ namespace UnityStandardAssets.Vehicles.Car
                 m_HighDecel = SetUpEngineAudioSource(highDecelClip);
             }
 
-            m_honk = SetUpHonkAudioSource(honkClip);
+            m_Honk = SetUpHonkAudioSource(honkClip);
+            m_Shift = SetUpShiftAudioSource(gearShiftClip);
+            m_LastNeutral = m_CarController.Neutral;
 
             // flag that we have started the sounds playing
             m_StartedSound = true;
@@ -160,8 +167,35 @@ namespace UnityStandardAssets.Vehicles.Car
                 // See if we need to play the horn and reset the flag
                 if (m_CarController.Honk)
                 {
-                    m_honk.Play();
+                    m_Honk.Play();
                     m_CarController.Honk = false;
+                }
+
+                // See if we need to play the gear shift sound
+                if (m_CarController.Neutral != m_LastNeutral)
+                {
+                    m_Shift.Play();
+                    m_LastNeutral = m_CarController.Neutral;
+                }
+
+                // Pitch the shifting sound based on the loop progress
+                if (m_Shift.isPlaying)
+                {
+                    // Find relevant values
+                    float pitchProgress = m_Shift.time / gearShiftClip.length;
+                    float pitchRange = shiftPitchMax - shiftPitchMin;
+                    float pitchValue = pitchRange * pitchProgress;
+
+                    if (!m_LastNeutral)
+                    {
+                        // Shifting into drive, pitch up
+                        m_Shift.pitch = shiftPitchMin + pitchValue;
+                    }
+                    else
+                    {
+                        // Shifting into neutral, pitch down
+                        m_Shift.pitch = shiftPitchMax - pitchValue;
+                    }
                 }
             }
         }
@@ -192,13 +226,27 @@ namespace UnityStandardAssets.Vehicles.Car
         /// <returns>Initialized audio source</returns>
         private AudioSource SetUpHonkAudioSource(AudioClip clip)
         {
+            return SetUpGeneralAudioSource(clip);
+        }
+
+        /// <summary>
+        /// Set up the shifter audio
+        /// </summary>
+        /// <param name="clip">Audio clip to play</param>
+        /// <returns>Initialized audio source</returns>
+        private AudioSource SetUpShiftAudioSource(AudioClip clip)
+        {
+            return SetUpGeneralAudioSource(clip);
+        }
+
+        private AudioSource SetUpGeneralAudioSource(AudioClip clip)
+        {
             // create the new audio source component on the game object and set up its properties
             AudioSource source = gameObject.AddComponent<AudioSource>();
             source.clip = clip;
             source.volume = 1;
             source.loop = false;
 
-            // start the clip from a random point
             source.minDistance = 5;
             source.maxDistance = maxRolloffDistance;
             source.dopplerLevel = 0;

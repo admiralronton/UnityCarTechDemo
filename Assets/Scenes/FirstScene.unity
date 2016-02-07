@@ -818,6 +818,18 @@ Prefab:
       propertyPath: honkClip
       value: 
       objectReference: {fileID: 8300000, guid: e815a1bd3e580dc46adf19e720d277b1, type: 3}
+    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
+      propertyPath: gearShiftClip
+      value: 
+      objectReference: {fileID: 8300000, guid: ee3f431d85f1bc94b9da2ac63496c3e8, type: 3}
+    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
+      propertyPath: shiftPitchMax
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
+      propertyPath: shiftPitchMin
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
   m_IsPrefabParent: 0
