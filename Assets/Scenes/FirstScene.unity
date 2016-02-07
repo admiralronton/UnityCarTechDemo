@@ -753,7 +753,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 414336, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 6.82
+      value: 10.81
       objectReference: {fileID: 0}
     - target: {fileID: 414336, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
       propertyPath: m_LocalPosition.z
@@ -779,7 +779,7 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6580742, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
+    - target: {fileID: 6576196, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: 67db31eead11e8d6d00011d98d76c639,
@@ -789,31 +789,11 @@ Prefab:
       value: 
       objectReference: {fileID: 13400000, guid: 67db31eead11e8d6d00011d98d76c639,
         type: 2}
-    - target: {fileID: 6576196, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
+    - target: {fileID: 6580742, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 13400000, guid: 67db31eead11e8d6d00011d98d76c639,
         type: 2}
-    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
-      propertyPath: engineSoundStyle
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
-      propertyPath: honkClip
-      value: 
-      objectReference: {fileID: 8300000, guid: e815a1bd3e580dc46adf19e720d277b1, type: 3}
-    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
-      propertyPath: gearShiftClip
-      value: 
-      objectReference: {fileID: 8300000, guid: ee3f431d85f1bc94b9da2ac63496c3e8, type: 3}
-    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
-      propertyPath: shiftPitchMax
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 11439402, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
-      propertyPath: shiftPitchMin
-      value: 0.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9cca6c7b2e303344eaa703e1659c48f2, type: 2}
   m_IsPrefabParent: 0

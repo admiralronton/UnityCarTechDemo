@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace UnityStandardAssets.Vehicles.Car
@@ -48,6 +50,7 @@ namespace UnityStandardAssets.Vehicles.Car
         private float m_CurrentTorque;
         private Rigidbody m_Rigidbody;
         private const float k_ReversingThreshold = 0.01f;
+        private List<ParticleSystem> m_Exhausts;
 
         public bool Skidding { get; private set; }
         public float BrakeInput { get; private set; }
@@ -85,6 +88,12 @@ namespace UnityStandardAssets.Vehicles.Car
             m_CurrentTorque = m_FullTorqueOverAllWheels - (m_TractionControl*m_FullTorqueOverAllWheels);
 
             Neutral = false;
+
+            m_Exhausts = transform.root.GetComponentsInChildren<ParticleSystem>().Where(c => c.name.StartsWith("ParticleExhaust")).ToList();
+            foreach(ParticleSystem particle in m_Exhausts)
+            {
+                particle.Stop();
+            }
         }
 
 
@@ -182,6 +191,7 @@ namespace UnityStandardAssets.Vehicles.Car
 
             SteerHelper();
             ApplyDrive(accel, footbrake);
+            ProcessExhaust(accel);
             CapSpeed();
 
             //Set the handbrake.
@@ -398,6 +408,28 @@ namespace UnityStandardAssets.Vehicles.Car
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Play or pause all exhaust items if the car is accelerating either forward or backward
+        /// </summary>
+        /// <param name="accel">Acceleration value</param>
+        private void ProcessExhaust(float accel)
+        {
+            float accelAbs = Mathf.Abs(accel);
+            float threshold = 0.0001f; // To account for float play
+            foreach(ParticleSystem exhaust in m_Exhausts)
+            {
+                if (accelAbs >= threshold && !exhaust.isPlaying)
+                {
+                    exhaust.Play();
+                }
+                else if (accelAbs < threshold && exhaust.isPlaying)
+                {
+                    // We pause instead of stop, because for some reason stopping takes a while.  This gives us more instant effects.
+                    exhaust.Pause();
+                }
+            }
         }
     }
 }

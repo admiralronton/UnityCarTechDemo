@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace UnityStandardAssets.Vehicles.Car
 {
@@ -20,7 +22,7 @@ namespace UnityStandardAssets.Vehicles.Car
 
         private void Start()
         {
-            skidParticles = transform.root.GetComponentInChildren<ParticleSystem>();
+            skidParticles = transform.root.GetComponentsInChildren<ParticleSystem>().Where(c => c.name == "ParticleBurnoutSmoke").FirstOrDefault();
 
             if (skidParticles == null)
             {
