@@ -32,6 +32,12 @@ namespace UnityStandardAssets.Vehicles.Car
                 m_Car.Neutral = !m_Car.Neutral;
             }
 
+            // Honk
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                m_Car.Honk = true;
+            }
+
             m_Car.Move(h, v, v, handbrake);
 #else
             m_Car.Move(h, v, v, 0f);

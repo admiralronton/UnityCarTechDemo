@@ -57,6 +57,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public float Revs { get; private set; }
         public float AccelInput { get; private set; }
         public bool Neutral { get; set; }
+        public bool Honk { get; set; }  // This is purely for the audio script to act on.  True means the Honk noise should play.
 
         // Use this for initialization
         private void Start()

@@ -34,6 +34,7 @@ namespace UnityStandardAssets.Vehicles.Car
         public AudioClip lowDecelClip;                                              // Audio clip for low deceleration
         public AudioClip highAccelClip;                                             // Audio clip for high acceleration
         public AudioClip highDecelClip;                                             // Audio clip for high deceleration
+        public AudioClip honkClip;                                                  // Audio clip for honking
         public float pitchMultiplier = 1f;                                          // Used for altering the pitch of audio clips
         public float lowPitchMin = 1f;                                              // The lowest possible pitch for the low sounds
         public float lowPitchMax = 6f;                                              // The highest possible pitch for the low sounds
@@ -46,6 +47,7 @@ namespace UnityStandardAssets.Vehicles.Car
         private AudioSource m_LowDecel; // Source for the low deceleration sounds
         private AudioSource m_HighAccel; // Source for the high acceleration sounds
         private AudioSource m_HighDecel; // Source for the high deceleration sounds
+        private AudioSource m_honk; // Source for honking
         private bool m_StartedSound; // flag for knowing if we have started sounds
         private CarController m_CarController; // Reference to car we are controlling
 
@@ -65,6 +67,8 @@ namespace UnityStandardAssets.Vehicles.Car
                 m_LowDecel = SetUpEngineAudioSource(lowDecelClip);
                 m_HighDecel = SetUpEngineAudioSource(highDecelClip);
             }
+
+            m_honk = SetUpHonkAudioSource(honkClip);
 
             // flag that we have started the sounds playing
             m_StartedSound = true;
@@ -152,6 +156,13 @@ namespace UnityStandardAssets.Vehicles.Car
                     m_HighDecel.dopplerLevel = useDoppler ? dopplerLevel : 0;
                     m_LowDecel.dopplerLevel = useDoppler ? dopplerLevel : 0;
                 }
+
+                // See if we need to play the horn and reset the flag
+                if (m_CarController.Honk)
+                {
+                    m_honk.Play();
+                    m_CarController.Honk = false;
+                }
             }
         }
 
@@ -174,6 +185,25 @@ namespace UnityStandardAssets.Vehicles.Car
             return source;
         }
 
+        /// <summary>
+        /// Set up the horn
+        /// </summary>
+        /// <param name="clip">Audio clip to play</param>
+        /// <returns>Initialized audio source</returns>
+        private AudioSource SetUpHonkAudioSource(AudioClip clip)
+        {
+            // create the new audio source component on the game object and set up its properties
+            AudioSource source = gameObject.AddComponent<AudioSource>();
+            source.clip = clip;
+            source.volume = 1;
+            source.loop = false;
+
+            // start the clip from a random point
+            source.minDistance = 5;
+            source.maxDistance = maxRolloffDistance;
+            source.dopplerLevel = 0;
+            return source;
+        }
 
         // unclamped versions of Lerp and Inverse Lerp, to allow value to exceed the from-to range
         private static float ULerp(float from, float to, float value)
