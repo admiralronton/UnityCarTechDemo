@@ -6,11 +6,11 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ParticleSmokeWhite
-  m_Shader: {fileID: 202, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: ParticleFog
+  m_Shader: {fileID: 203, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
@@ -26,7 +26,7 @@ Material:
       data:
         first:
           name: _InvFade
-        second: 0.8275
+        second: 0.25
     m_Colors:
       data:
         first:
@@ -35,7 +35,7 @@ Material:
       data:
         first:
           name: _TintColor
-        second: {r: 0.35820895, g: 0.35820895, b: 0.35820895, a: 0.75686276}
+        second: {r: 0.7647059, g: 0.7647059, b: 0.7647059, a: 0.07058824}
 --- !u!1002 &2100001
 EditorExtensionImpl:
   serializedVersion: 6
