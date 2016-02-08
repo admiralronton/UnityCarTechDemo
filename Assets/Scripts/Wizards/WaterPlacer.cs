@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 using System.Collections;
 
@@ -62,3 +63,4 @@ public class WaterPlacer : ScriptableWizard
         Water.transform.position = waterPosition;
     }
 }
+#endif
